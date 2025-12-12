@@ -1,55 +1,16 @@
 body {
     margin: 0;
+    overflow: hidden;
     font-family: "Microsoft JhengHei", sans-serif;
 }
 
+/* 地圖全螢幕 */
 #map {
     width: 100vw;
     height: 100vh;
-    background-image: url("https://upload.wikimedia.org/wikipedia/commons/1/10/Taiwan_relief_map2.png"); /* 台灣地圖 */
-    background-size: cover;
-    background-position: center;
-    position: relative;
-    overflow: hidden;
 }
 
-.ship {
-    width: 50px;
-    position: absolute;
-    cursor: pointer;
-}
-
-/* === 船隻起始位置（港口） === */
-/* 高雄港 */
-#ship1 { top: 75%; left: 40%; }
-/* 台中港 */
-#ship2 { top: 60%; left: 35%; }
-/* 基隆港 */
-#ship3 { top: 30%; left: 48%; }
-
-/* === 事故點位置 === */
-/* 花蓮外海 */
-#acc1 { top: 38%; left: 75%; }
-/* 巴士海峽 */
-#acc2 { top: 85%; left: 65%; }
-/* 澎湖西方海域 */
-#acc3 { top: 55%; left: 15%; }
-
-.accident-point {
-    width: 22px;
-    height: 22px;
-    background-color: red;
-    border-radius: 50%;
-    position: absolute;
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0% { transform: scale(0.6); opacity: 1; }
-    100% { transform: scale(1.5); opacity: 0; }
-}
-
-/* 事故資訊框 */
+/* 資訊框 */
 #infoBox {
     position: absolute;
     top: 20px;
@@ -59,11 +20,12 @@ body {
     width: 250px;
     border-radius: 12px;
     box-shadow: 0 0 8px #0004;
+    z-index: 9999;
 }
 .hidden { display: none; }
 
 button {
-    margin-top: 15px;
+    margin-top: 10px;
     padding: 8px 12px;
     background: #0077cc;
     color: white;
