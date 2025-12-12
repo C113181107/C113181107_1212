@@ -1,0 +1,66 @@
+body {
+    margin: 0;
+    font-family: "Microsoft JhengHei", sans-serif;
+}
+
+#map {
+    width: 100vw;
+    height: 100vh;
+    background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/BlankMap-World-v2.png/1280px-BlankMap-World-v2.png");
+    background-size: cover;
+    position: relative;
+    overflow: hidden;
+}
+
+.ship {
+    width: 50px;
+    position: absolute;
+    cursor: pointer;
+}
+
+/* 起始船隻位置 */
+#ship1 { top: 75%; left: 18%; }
+#ship2 { top: 68%; left: 25%; }
+#ship3 { top: 82%; left: 30%; }
+
+/* 事故位置 */
+#acc1 { top: 40%; left: 60%; }
+#acc2 { top: 50%; left: 70%; }
+#acc3 { top: 30%; left: 50%; }
+
+.accident-point {
+    width: 22px;
+    height: 22px;
+    background-color: red;
+    border-radius: 50%;
+    position: absolute;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.6); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* 事故資訊卡 */
+#infoBox {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: white;
+    padding: 20px;
+    width: 250px;
+    border-radius: 12px;
+    box-shadow: 0 0 8px #0004;
+}
+.hidden { display: none; }
+
+button {
+    margin-top: 15px;
+    padding: 8px 12px;
+    background: #0077cc;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
