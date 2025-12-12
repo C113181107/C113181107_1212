@@ -23,7 +23,7 @@
 
   // 船圖示，透明 PNG
   var shipIcon = L.icon({
-    iconUrl: '1.png', // 確認是去背 PNG
+    iconUrl: '1.png', // 去背 PNG
     iconSize: [40, 40],
     iconAnchor: [20, 20] // 對齊船中心
   });
@@ -35,11 +35,11 @@
     L.marker([25.15, 121.75], {icon: shipIcon}).addTo(map)  // 基隆港
   ];
 
-  // 事故位置及事件
+  // 事故位置、名稱及原因
   var accidents = [
-    {lat: 23.8, lng: 122.1, title: '花蓮外海觸礁'},
-    {lat: 21.9, lng: 121.3, title: '巴士海峽火災'},
-    {lat: 23.6, lng: 119.1, title: '澎湖外海碰撞'}
+    {lat: 23.8, lng: 122.1, title: '花蓮外海觸礁', description: '因颱風強風影響，船隻偏離航道撞礁。'},
+    {lat: 21.9, lng: 121.3, title: '巴士海峽火災', description: '船上油料起火，迅速蔓延導致火災。'},
+    {lat: 23.6, lng: 119.1, title: '澎湖外海碰撞', description: '視線不佳，兩船發生碰撞。'}
   ];
 
   // 點擊船觸發移動及顯示事故事件
@@ -54,10 +54,10 @@
           clearInterval(interval); 
           ship.setLatLng([target.lat, target.lng]); 
 
-          // 顯示事故事件 popup
+          // 顯示事故事件名稱與原因 popup
           L.circleMarker([target.lat, target.lng], {radius:10, color:'red', fillColor:'red', fillOpacity:0.7})
             .addTo(map)
-            .bindPopup(target.title)
+            .bindPopup(`<b>${target.title}</b><br>${target.description}`)
             .openPopup();
           return; 
         }
