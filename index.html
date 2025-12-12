@@ -1,41 +1,30 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>航道事故風險地圖（台灣海域）</title>
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>航道事故風險地圖（真實地圖）</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="map">
+<div id="map"></div>
 
-        <!-- 船隻：高雄、台中、基隆 -->
-        <img src="https://cdn-icons-png.flaticon.com/512/69/69906.png"
-             class="ship" id="ship1" data-target="acc1" />
+<!-- 事故資訊 -->
+<div id="infoBox" class="hidden">
+    <h2 id="accTitle"></h2>
+    <p id="accDesc"></p>
+    <button onclick="closeInfo()">關閉</button>
+</div>
 
-        <img src="https://cdn-icons-png.flaticon.com/512/69/69906.png"
-             class="ship" id="ship2" data-target="acc2" />
-
-        <img src="https://cdn-icons-png.flaticon.com/512/69/69906.png"
-             class="ship" id="ship3" data-target="acc3" />
-
-        <!-- 事故點：台灣東部海域、巴士海峽、澎湖外海 -->
-        <div class="accident-point" id="acc1"></div>
-        <div class="accident-point" id="acc2"></div>
-        <div class="accident-point" id="acc3"></div>
-
-        <!-- 航線（SVG） -->
-        <svg id="routes"></svg>
-    </div>
-
-    <!-- 事故資訊 -->
-    <div id="infoBox" class="hidden">
-        <h2 id="accTitle"></h2>
-        <p id="accDesc"></p>
-        <button onclick="closeInfo()">關閉</button>
-    </div>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script src="script.js"></script>
+
 </body>
 </html>
