@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>航道事故風險地圖</title>
+    <title>航道事故風險地圖（台灣海域）</title>
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
     <div id="map">
 
-        <!-- 船隻 -->
+        <!-- 船隻：高雄、台中、基隆 -->
         <img src="https://cdn-icons-png.flaticon.com/512/69/69906.png"
              class="ship" id="ship1" data-target="acc1" />
 
@@ -20,14 +20,13 @@
         <img src="https://cdn-icons-png.flaticon.com/512/69/69906.png"
              class="ship" id="ship3" data-target="acc3" />
 
-        <!-- 多個事故點 -->
+        <!-- 事故點：台灣東部海域、巴士海峽、澎湖外海 -->
         <div class="accident-point" id="acc1"></div>
         <div class="accident-point" id="acc2"></div>
         <div class="accident-point" id="acc3"></div>
 
-        <!-- SVG 航線路徑 -->
+        <!-- 航線（SVG） -->
         <svg id="routes"></svg>
-
     </div>
 
     <!-- 事故資訊 -->
