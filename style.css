@@ -6,8 +6,9 @@ body {
 #map {
     width: 100vw;
     height: 100vh;
-    background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/BlankMap-World-v2.png/1280px-BlankMap-World-v2.png");
+    background-image: url("https://upload.wikimedia.org/wikipedia/commons/1/10/Taiwan_relief_map2.png"); /* 台灣地圖 */
     background-size: cover;
+    background-position: center;
     position: relative;
     overflow: hidden;
 }
@@ -18,15 +19,21 @@ body {
     cursor: pointer;
 }
 
-/* 起始船隻位置 */
-#ship1 { top: 75%; left: 18%; }
-#ship2 { top: 68%; left: 25%; }
-#ship3 { top: 82%; left: 30%; }
+/* === 船隻起始位置（港口） === */
+/* 高雄港 */
+#ship1 { top: 75%; left: 40%; }
+/* 台中港 */
+#ship2 { top: 60%; left: 35%; }
+/* 基隆港 */
+#ship3 { top: 30%; left: 48%; }
 
-/* 事故位置 */
-#acc1 { top: 40%; left: 60%; }
-#acc2 { top: 50%; left: 70%; }
-#acc3 { top: 30%; left: 50%; }
+/* === 事故點位置 === */
+/* 花蓮外海 */
+#acc1 { top: 38%; left: 75%; }
+/* 巴士海峽 */
+#acc2 { top: 85%; left: 65%; }
+/* 澎湖西方海域 */
+#acc3 { top: 55%; left: 15%; }
 
 .accident-point {
     width: 22px;
@@ -42,7 +49,7 @@ body {
     100% { transform: scale(1.5); opacity: 0; }
 }
 
-/* 事故資訊卡 */
+/* 事故資訊框 */
 #infoBox {
     position: absolute;
     top: 20px;
