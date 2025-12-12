@@ -1,68 +1,99 @@
-// 事故資料庫（台灣版）
-const accidentInfo = {
-    acc1: { title: "花蓮外海觸礁事故", desc: "船舶受到黑潮影響偏航，最後於花蓮外海觸礁。" },
-    acc2: { title: "巴士海峽漁船火災", desc: "漁船引擎室起火，隨後於巴士海峽求救停船。" },
-    acc3: { title: "澎湖外海碰撞事故", desc: "兩艘船於濃霧中視線不良導致碰撞。" }
+// 初始化地圖（中心點設台灣）
+var map = L.map('map').setView([23.7, 121], 7);
+
+// 載入 OpenStreetMap 圖磚（免費）
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19
+}).addTo(map);
+
+// 船隻圖示
+var shipIcon = L.icon({
+    iconUrl: "https://cdn-icons-png.flaticon.com/512/69/69906.png",
+    iconSize: [40, 40]
+});
+
+// === 港口(起點)座標 ===
+const ships = {
+    ship1: { marker: null, pos: [22.62, 120.30], target: "acc1" }, // 高雄港
+    ship2: { marker: null, pos: [24.26, 120.54], target: "acc2" }, // 台中港
+    ship3: { marker: null, pos: [25.15, 121.75], target: "acc3" }  // 基隆港
 };
 
-// 船被點擊
-document.querySelectorAll(".ship").forEach(ship => {
-    ship.addEventListener("click", () => {
-        let target = document.getElementById(ship.dataset.target);
-        animateShipAlongCurve(ship, target);
-        showInfo(ship.dataset.target);
+// === 事故位置 ===
+const accidents = {
+    acc1: { pos: [23.8, 122.1], title: "花蓮外海觸礁", desc: "黑潮影響導致偏航觸礁。" },
+    acc2: { pos: [21.9, 121.3], title: "巴士海峽火災", desc: "引擎室火災後停船求救。" },
+    acc3: { pos: [23.6, 119.1], title: "澎湖外海碰撞", desc: "濃霧中視線不佳造成碰撞。" }
+};
+
+
+// === 建立事故點（紅色脈衝） ===
+Object.keys(accidents).forEach(id => {
+    L.circleMarker(accidents[id].pos, {
+        radius: 10,
+        color: "red",
+        fillColor: "red",
+        fillOpacity: 0.7
+    }).addTo(map).on("click", () => {
+        showInfo(id);
     });
 });
 
-// === 船沿曲線航線移動 ===
-function animateShipAlongCurve(ship, target) {
 
-    const start = ship.getBoundingClientRect();
-    const end = target.getBoundingClientRect();
+// === 建立船隻 ===
+Object.keys(ships).forEach(id => {
+    let ship = ships[id];
 
-    // 控制點，用來製作彎曲航線（自動置中提高）
-    const controlX = (start.left + end.left) / 2;
-    const controlY = Math.min(start.top, end.top) - 200;
+    ship.marker = L.marker(ship.pos, { icon: shipIcon }).addTo(map);
 
-    // 建立 SVG 路線
-    let svg = document.getElementById("routes");
-    let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    ship.marker.on("click", () => {
+        animateShip(id);
+        showInfo(ship.target);
+    });
+});
 
-    let d = `M ${start.left} ${start.top} Q ${controlX} ${controlY}, ${end.left} ${end.top}`;
-    path.setAttribute("d", d);
-    path.setAttribute("stroke", "yellow");
-    path.setAttribute("stroke-width", "4");
-    path.setAttribute("fill", "none");
-    path.setAttribute("id", "route-" + ship.id);
-    svg.appendChild(path);
 
-    // 路線動畫
-    let length = path.getTotalLength();
-    path.style.strokeDasharray = length;
-    path.style.strokeDashoffset = length;
-    path.style.transition = "stroke-dashoffset 3s linear";
-    setTimeout(() => path.style.strokeDashoffset = "0", 50);
+// === 顯示事故資訊 ===
+function showInfo(id) {
+    document.getElementById("infoBox").classList.remove("hidden");
+    document.getElementById("accTitle").innerText = accidents[id].title;
+    document.getElementById("accDesc").innerText = accidents[id].desc;
+}
 
-    // 船隻移動
+function closeInfo() {
+    document.getElementById("infoBox").classList.add("hidden");
+}
+
+
+
+// === 船隻曲線航線動畫 ===
+function animateShip(shipId) {
+    let ship = ships[shipId];
+    let start = ship.pos;
+    let end = accidents[ship.target].pos;
+
+    // 控制點（使航線產生弧度、往外海彎）
+    let ctrl = [
+        (start[0] + end[0]) / 2,
+        Math.max(start[1], end[1]) + 1.5
+    ];
+
     let t = 0;
     let interval = setInterval(() => {
         t += 0.01;
-        if (t > 1) { clearInterval(interval); return; }
+        if (t > 1) { clearInterval(interval); }
 
-        let pos = path.getPointAtLength(length * t);
-        ship.style.left = pos.x + "px";
-        ship.style.top = pos.y + "px";
+        // 二階貝茲曲線 Q(t)
+        let lat =
+            (1 - t) * (1 - t) * start[0] +
+            2 * (1 - t) * t * ctrl[0] +
+            t * t * end[0];
+
+        let lng =
+            (1 - t) * (1 - t) * start[1] +
+            2 * (1 - t) * t * ctrl[1] +
+            t * t * end[1];
+
+        ship.marker.setLatLng([lat, lng]);
     }, 20);
-}
-
-// 顯示事故資訊
-function showInfo(id) {
-    document.getElementById("infoBox").classList.remove("hidden");
-    document.getElementById("accTitle").innerText = accidentInfo[id].title;
-    document.getElementById("accDesc").innerText = accidentInfo[id].desc;
-}
-
-// 關閉
-function closeInfo() {
-    document.getElementById("infoBox").classList.add("hidden");
 }
