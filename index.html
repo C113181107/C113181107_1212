@@ -15,60 +15,59 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+  // 初始化地圖
   var map = L.map('map').setView([23.7, 121], 7);
 
+  // 載入 OpenStreetMap 圖磚
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
+  // 船圖示，透明 PNG
   var shipIcon = L.icon({
-    iconUrl: '1.png',
+    iconUrl: '1.png', // 去背 PNG
     iconSize: [40, 40],
-    iconAnchor: [20, 20]
+    iconAnchor: [20, 20] // 對齊船中心
   });
 
+  // 港口起點船隻
   var ships = [
-    L.marker([22.62, 120.30], {icon: shipIcon, rotationAngle: 0}).addTo(map),
-    L.marker([24.26, 120.54], {icon: shipIcon, rotationAngle: 0}).addTo(map),
-    L.marker([25.15, 121.75], {icon: shipIcon, rotationAngle: 0}).addTo(map)
+    L.marker([22.62, 120.30], {icon: shipIcon}).addTo(map), // 高雄港
+    L.marker([24.26, 120.54], {icon: shipIcon}).addTo(map), // 台中港
+    L.marker([25.15, 121.75], {icon: shipIcon}).addTo(map)  // 基隆港
   ];
 
+  // 事故位置、名稱及原因
   var accidents = [
     {lat: 23.8, lng: 122.1, title: '花蓮外海觸礁', description: '因颱風強風影響，船隻偏離航道撞礁。'},
     {lat: 21.9, lng: 121.3, title: '巴士海峽火災', description: '船上油料起火，迅速蔓延導致火災。'},
     {lat: 23.6, lng: 119.1, title: '澎湖外海碰撞', description: '視線不佳，兩船發生碰撞。'}
   ];
 
-  function moveShip(ship, target) {
-    var latlngs = [ship.getLatLng(), L.latLng(target.lat, target.lng)];
-    var t = 0;
-    var interval = setInterval(() => {
-      t += 0.01;
-      if (t > 1) {
-        clearInterval(interval);
-        ship.setLatLng([target.lat, target.lng]);
-
-        L.circleMarker([target.lat, target.lng], {radius:10, color:'red', fillColor:'red', fillOpacity:0.7})
-          .addTo(map)
-          .bindPopup(`<b>${target.title}</b><br>${target.description}`)
-          .openPopup();
-        return;
-      }
-
-      var lat = (1-t)*latlngs[0].lat + t*latlngs[1].lat;
-      var lng = (1-t)*latlngs[0].lng + t*latlngs[1].lng;
-      ship.setLatLng([lat, lng]);
-
-      // 計算角度旋轉船方向
-      var dx = latlngs[1].lng - latlngs[0].lng;
-      var dy = latlngs[1].lat - latlngs[0].lat;
-      var angle = Math.atan2(dy, dx) * (180 / Math.PI);
-      ship.setRotationAngle(angle);
-    }, 20);
-  }
-
+  // 點擊船觸發移動及顯示事故事件
   ships.forEach((ship, i) => {
-    ship.on('click', () => moveShip(ship, accidents[i]));
+    ship.on('click', () => {
+      var target = accidents[i];
+      var latlngs = [ship.getLatLng(), L.latLng(target.lat, target.lng)];
+      var t = 0;
+      var interval = setInterval(() => {
+        t += 0.01;
+        if(t>1){ 
+          clearInterval(interval); 
+          ship.setLatLng([target.lat, target.lng]); 
+
+          // 顯示事故事件名稱與原因 popup
+          L.circleMarker([target.lat, target.lng], {radius:10, color:'red', fillColor:'red', fillOpacity:0.7})
+            .addTo(map)
+            .bindPopup(`<b>${target.title}</b><br>${target.description}`)
+            .openPopup();
+          return; 
+        }
+        // 線性插值移動船
+        var lat = (1-t)*latlngs[0].lat + t*latlngs[1].lat;
+        var lng = (1-t)*latlngs[0].lng + t*latlngs[1].lng;
+        ship.setLatLng([lat, lng]);
+      }, 20);
+    });
   });
 </script>
-<script src="https://rawcdn.githack.com/bbecquet/Leaflet.RotatedMarker/master/leaflet.rotatedMarker.js"></script>
 </body>
 </html>
