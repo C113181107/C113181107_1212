@@ -1,11 +1,11 @@
-// 事故資料
+// 事故資料庫（台灣版）
 const accidentInfo = {
-    acc1: { title: "油輪觸礁事故", desc: "強風浪導致船舶偏航，最終於此處觸礁並造成油污外洩。" },
-    acc2: { title: "貨櫃船碰撞事故", desc: "航道視線不佳導致兩艘船相撞，造成大量貨櫃落海。" },
-    acc3: { title: "漁船火災事故", desc: "引擎室電線短路，引發火勢並於此處求救停靠。" }
+    acc1: { title: "花蓮外海觸礁事故", desc: "船舶受到黑潮影響偏航，最後於花蓮外海觸礁。" },
+    acc2: { title: "巴士海峽漁船火災", desc: "漁船引擎室起火，隨後於巴士海峽求救停船。" },
+    acc3: { title: "澎湖外海碰撞事故", desc: "兩艘船於濃霧中視線不良導致碰撞。" }
 };
 
-// 點擊船後觸發
+// 船被點擊
 document.querySelectorAll(".ship").forEach(ship => {
     ship.addEventListener("click", () => {
         let target = document.getElementById(ship.dataset.target);
@@ -14,15 +14,15 @@ document.querySelectorAll(".ship").forEach(ship => {
     });
 });
 
-// 🚢 船沿曲線航道移動
+// === 船沿曲線航線移動 ===
 function animateShipAlongCurve(ship, target) {
 
     const start = ship.getBoundingClientRect();
     const end = target.getBoundingClientRect();
 
-    // 控制點 (決定曲線形狀)
+    // 控制點，用來製作彎曲航線（自動置中提高）
     const controlX = (start.left + end.left) / 2;
-    const controlY = start.top - 200;
+    const controlY = Math.min(start.top, end.top) - 200;
 
     // 建立 SVG 路線
     let svg = document.getElementById("routes");
@@ -31,7 +31,7 @@ function animateShipAlongCurve(ship, target) {
     let d = `M ${start.left} ${start.top} Q ${controlX} ${controlY}, ${end.left} ${end.top}`;
     path.setAttribute("d", d);
     path.setAttribute("stroke", "yellow");
-    path.setAttribute("stroke-width", "3");
+    path.setAttribute("stroke-width", "4");
     path.setAttribute("fill", "none");
     path.setAttribute("id", "route-" + ship.id);
     svg.appendChild(path);
@@ -43,7 +43,7 @@ function animateShipAlongCurve(ship, target) {
     path.style.transition = "stroke-dashoffset 3s linear";
     setTimeout(() => path.style.strokeDashoffset = "0", 50);
 
-    // 船移動動畫（沿著 path）
+    // 船隻移動
     let t = 0;
     let interval = setInterval(() => {
         t += 0.01;
@@ -61,6 +61,8 @@ function showInfo(id) {
     document.getElementById("accTitle").innerText = accidentInfo[id].title;
     document.getElementById("accDesc").innerText = accidentInfo[id].desc;
 }
+
+// 關閉
 function closeInfo() {
     document.getElementById("infoBox").classList.add("hidden");
 }
