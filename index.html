@@ -1,30 +1,94 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>航道事故風險地圖（真實地圖）</title>
-
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>航道事故風險地圖（台灣版）</title>
+<style>
+    body { margin: 0; overflow: hidden; }
+    #map {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+    }
+    .ship {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        transform: translate(-50%, -50%);
+        cursor: pointer;
+        transition: transform 0.3s;
+    }
+    .ship:hover { transform: translate(-50%, -50%) scale(1.1); }
+    .accident-marker {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background: red;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+    }
+</style>
 </head>
 <body>
+    <!-- 背景使用真實台灣地圖圖片（自行放入 map.jpg） -->
+    <img id="map" src="map.jpg" alt="Taiwan Map" />
 
-<div id="map"></div>
+    <!-- 放置多艘船（照片 1.jpg） -->
+    <img src="1.jpg" class="ship" id="ship1" style="top: 85%; left: 45%;" />
+    <img src="1.jpg" class="ship" id="ship2" style="top: 78%; left: 40%;" />
+    <img src="1.jpg" class="ship" id="ship3" style="top: 70%; left: 60%;" />
 
-<!-- 事故資訊 -->
-<div id="infoBox" class="hidden">
-    <h2 id="accTitle"></h2>
-    <p id="accDesc"></p>
-    <button onclick="closeInfo()">關閉</button>
-</div>
+    <!-- 多事故點 -->
+    <div class="accident-marker" id="acc1" style="top: 40%; left: 55%; display:none;"></div>
+    <div class="accident-marker" id="acc2" style="top: 55%; left: 70%; display:none;"></div>
+    <div class="accident-marker" id="acc3" style="top: 30%; left: 40%; display:none;"></div>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// 定義每艘船對應事故點的曲線路徑
+const routes = {
+    ship1: { accident: "acc1", path: [
+        {x:45, y:85}, {x:48, y:70}, {x:52, y:55}, {x:55, y:40}
+    ]},
+    ship2: { accident: "acc2", path: [
+        {x:40, y:78}, {x:48, y:72}, {x:60, y:65}, {x:70, y:55}
+    ]},
+    ship3: { accident: "acc3", path: [
+        {x:60, y:70}, {x:55, y:60}, {x:48, y:45}, {x:40, y:30}
+    ]},
+};
 
-<script src="script.js"></script>
+function animateShip(shipId) {
+    const ship = document.getElementById(shipId);
+    const route = routes[shipId].path;
+    const acc = document.getElementById(routes[shipId].accident);
 
+    let i = 0;
+    function move() {
+        if (i >= route.length) {
+            acc.style.display = "block";
+            return;
+        }
+        ship.style.left = route[i].x + "%";
+        ship.style.top = route[i].y + "%";
+        i++;
+        setTimeout(move, 600);
+    }
+    move();
+}
+
+// 每艘船都可以被點擊
+Object.keys(routes).forEach(id => {
+    document.getElementById(id).addEventListener("click", () => animateShip(id));
+});
+</script>
 </body>
 </html>
