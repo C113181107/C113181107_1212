@@ -1,99 +1,65 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>航道事故風險地圖（台灣版）</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
-    body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
-
-    /* 地圖容器，使用背景圖 */
-    #map-container {
-        position: relative;
-        width: 100vw;
-        height: 100vh;
-        background-image: url('map.jpg'); /* 台灣地圖 */
-        background-size: cover;
-        background-position: center;
-    }
-
-    .ship {
-        position: absolute;
-        width: 50px;
-        height: 50px;
-        transform: translate(-50%, -50%);
-        cursor: pointer;
-        transition: transform 0.3s;
-    }
-    .ship:hover { transform: translate(-50%, -50%) scale(1.1); }
-
-    .accident-marker {
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        background: red;
-        border-radius: 50%;
-        transform: translate(-50%, -50%);
-        animation: pulse 1.5s infinite;
-        display: none;
-    }
-
-    @keyframes pulse {
-        0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
-    }
+  #map { width:100vw; height:100vh; }
+  .ship-icon { width:40px; height:40px; }
 </style>
 </head>
 <body>
-    <div id="map-container">
-        <!-- 三艘船，都使用同一張圖片 1.jpg -->
-        <img src="1.jpg" class="ship" id="ship1" style="top: 85%; left: 45%;" />
-        <img src="1.jpg" class="ship" id="ship2" style="top: 78%; left: 40%;" />
-        <img src="1.jpg" class="ship" id="ship3" style="top: 70%; left: 60%;" />
+<div id="map"></div>
 
-        <!-- 多事故點 -->
-        <div class="accident-marker" id="acc1" style="top: 40%; left: 55%;"></div>
-        <div class="accident-marker" id="acc2" style="top: 55%; left: 70%;"></div>
-        <div class="accident-marker" id="acc3" style="top: 30%; left: 40%;"></div>
-    </div>
-
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// 定義每艘船對應事故點的曲線路徑
-const routes = {
-    ship1: { accident: "acc1", path: [
-        {x:45, y:85}, {x:48, y:70}, {x:52, y:55}, {x:55, y:40}
-    ]},
-    ship2: { accident: "acc2", path: [
-        {x:40, y:78}, {x:48, y:72}, {x:60, y:65}, {x:70, y:55}
-    ]},
-    ship3: { accident: "acc3", path: [
-        {x:60, y:70}, {x:55, y:60}, {x:48, y:45}, {x:40, y:30}
-    ]},
-};
+  // 初始化地圖
+  var map = L.map('map').setView([23.7, 121], 7);
 
-function animateShip(shipId) {
-    const ship = document.getElementById(shipId);
-    const route = routes[shipId].path;
-    const acc = document.getElementById(routes[shipId].accident);
+  // 載入 OpenStreetMap 圖磚
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
-    let i = 0;
-    function move() {
-        if (i >= route.length) {
-            acc.style.display = "block";
-            return;
-        }
-        ship.style.left = route[i].x + "%";
-        ship.style.top = route[i].y + "%";
-        i++;
-        setTimeout(move, 600);
-    }
-    move();
-}
+  // 船圖示
+  var shipIcon = L.icon({ iconUrl: '1.jpg', iconSize: [40, 40] });
 
-// 每艘船都可以被點擊
-Object.keys(routes).forEach(id => {
-    document.getElementById(id).addEventListener("click", () => animateShip(id));
-});
+  // 港口起點船隻
+  var ships = [
+    L.marker([22.62, 120.30], {icon: shipIcon}).addTo(map), // 高雄港
+    L.marker([24.26, 120.54], {icon: shipIcon}).addTo(map), // 台中港
+    L.marker([25.15, 121.75], {icon: shipIcon}).addTo(map)  // 基隆港
+  ];
+
+  // 事故位置
+  var accidents = [
+    {lat: 23.8, lng: 122.1, title: '花蓮外海觸礁'},
+    {lat: 21.9, lng: 121.3, title: '巴士海峽火災'},
+    {lat: 23.6, lng: 119.1, title: '澎湖外海碰撞'}
+  ];
+
+  // 建立事故點
+  accidents.forEach(a => {
+    L.circleMarker([a.lat, a.lng], {radius:10, color:'red', fillColor:'red', fillOpacity:0.7})
+      .addTo(map)
+      .bindPopup(a.title);
+  });
+
+  // 點船觸發移動
+  ships.forEach((ship, i) => {
+    ship.on('click', () => {
+      var target = accidents[i];
+      var latlngs = [ship.getLatLng(), L.latLng(target.lat, target.lng)];
+      var t = 0;
+      var interval = setInterval(() => {
+        t += 0.01;
+        if(t>1){ clearInterval(interval); ship.setLatLng([target.lat, target.lng]); return; }
+        var lat = (1-t)*latlngs[0].lat + t*latlngs[1].lat;
+        var lng = (1-t)*latlngs[0].lng + t*latlngs[1].lng;
+        ship.setLatLng([lat, lng]);
+      }, 20);
+    });
+  });
 </script>
 </body>
 </html>
